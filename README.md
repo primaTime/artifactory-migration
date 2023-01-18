@@ -2,7 +2,7 @@
 
 ## Getting started
 
-The script is tested in Python version 3.9, make sure you run it in this version or newer (newer version may have some problems). The script uses the requests package, which you install using pip `pip install requests`.
+The script is tested in Python version 3.9, make sure you run it in this version or newer (newer version may have some problems). The script uses the requests and dateutil package, which you install using pip (`pip install requests`).
 You also need to have maven installed on your computer to run the script. And the `mvn` command in the terminal must work.
 
 You also need to set up maven settings on your computer. Below is a sample settings.xml file, which on macOS is located in ~/.m2/settings.xml.
@@ -58,3 +58,5 @@ You need to set up an active profile on github. Then a github server where you t
 
 </settings>
 ```
+
+If you use the --help argument, you will learn which arguments need to be set and what they are for.
