@@ -6,4 +6,5 @@ class ArtifactData(TypedDict):
     sources: str
     javadoc: str
     jar: str
+    jar_with_dependencies: str
     war: str

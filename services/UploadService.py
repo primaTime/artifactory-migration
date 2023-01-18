@@ -15,6 +15,20 @@ class UploadService:
         self.__token = token
         self.__only_app = only_app
 
+    def __generate_upload_command(self, pom: str):
+        return CommandBuilder()\
+            .add_argument("mvn") \
+            .add_argument("deploy:deploy-file") \
+            .add_mvn_argument("pomFile", pom) \
+            .add_mvn_argument("url", self.__destination_url) \
+            .add_mvn_argument("repositoryId", "github") \
+            .add_mvn_argument("token", self.__token)
+
+    def __upload(self, command_builder: CommandBuilder):
+        with subprocess.Popen(command_builder.build(), stdout=subprocess.PIPE) as proc:
+            PrintService.print("Command: {}".format(subprocess.list2cmdline(proc.args)))
+            print(proc.stdout.read())
+
     def __process_version(self, version_path: str, version: str):
         PrintService.print(f"Processing version {version}...")
         data: ArtifactData = {}
@@ -30,22 +44,18 @@ class UploadService:
                     data["sources"] = file_path
                 elif "javadoc" in file_name:
                     data["javadoc"] = file_path
-                elif "with-dependencies" not in file_name:
+                elif "with-dependencies" in file_name:
+                    data["jar_with_dependencies"] = file_path
+                else:
                     data["jar"] = file_path
             elif "war" in file_extension:
                 data["war"] = file_path
 
         try:
-            builder: CommandBuilder = CommandBuilder()
             if "pom" not in data:
                 raise ValueError("Pom file not found")
-            builder\
-                .add_argument("mvn")\
-                .add_argument("deploy:deploy-file")\
-                .add_mvn_argument("pomFile", data["pom"])\
-                .add_mvn_argument("url", self.__destination_url)\
-                .add_mvn_argument("repositoryId", "github")\
-                .add_mvn_argument("token", self.__token)
+
+            builder = self.__generate_upload_command(data["pom"])
 
             file_arg: str = "file"
             if "jar" in data or "war" in data:
@@ -61,9 +71,17 @@ class UploadService:
             if "javadoc" in data:
                 builder.add_mvn_argument("javadoc", data["javadoc"])
 
-            with subprocess.Popen(builder.build(), stdout=subprocess.PIPE) as proc:
-                PrintService.print("Command: {}".format(subprocess.list2cmdline(proc.args)))
-                print(proc.stdout.read())
+            self.__upload(builder)
+
+            # Uploading a jar file with dependencies does not work this way.
+            #if "jar_with_dependencies" in data:
+            #    builder\
+            #        .remove_mvn_argument("file")\
+            #        .remove_mvn_argument("sources")\
+            #        .remove_mvn_argument("javadoc")\
+            #        .add_mvn_argument("file", data["jar_with_dependencies"])
+            #    self.__upload(builder)
+
 
         except ValueError as e:
             PrintService.error(e.args[0])
