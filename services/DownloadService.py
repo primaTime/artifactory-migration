@@ -10,12 +10,11 @@ from services.PrintService import PrintService
 
 
 class DownloadService:
-    __request_service: RequestService = None
-    __year: int = None
 
-    def __init__(self, request_service: RequestService, year: int = None):
+    def __init__(self, request_service: RequestService, year: int = None, only_app: str = None):
         self.__request_service = request_service
         self.__year = year
+        self.__only_app = only_app
 
     def __create_directory(self, directory: str = ""):
         Path(Params.STORAGE_DIR + directory).mkdir(exist_ok=True)
@@ -80,5 +79,8 @@ class DownloadService:
         apps_list: list[ListItemResponse] = self.__retrieve_apps()
         self.__create_apps_dirs(apps_list)
         for app_meta in apps_list:
-            PrintService.h2(f"App {app_meta['uri'][1:]}")
+            app_name = app_meta['uri'][1:]
+            if self.__only_app is not None and app_name!=self.__only_app:
+                continue
+            PrintService.h2(f"App {app_name}")
             self.__create_versions_dirs(app_meta)

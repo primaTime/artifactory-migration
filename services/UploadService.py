@@ -9,14 +9,13 @@ from utils.CommandBuilder import CommandBuilder
 
 
 class UploadService:
-    __destination_url: str
-    __token: str
 
-    def __init__(self, destination_url: str, token: str):
+    def __init__(self, destination_url: str, token: str, only_app: str = None):
         self.__destination_url = destination_url
         self.__token = token
+        self.__only_app = only_app
 
-    def __process_version(self, version_path: str, app_name: str, version: str):
+    def __process_version(self, version_path: str, version: str):
         PrintService.print(f"Processing version {version}...")
         data: ArtifactData = {}
         for file_name in os.listdir(version_path):
@@ -78,12 +77,14 @@ class UploadService:
             version_path: str = os.path.join(path, version)
             if not os.path.isdir(version_path):
                 continue
-            self.__process_version(version_path, app_name, version)
+            self.__process_version(version_path, version)
 
     def run(self):
         PrintService.h1("Artifacts deploying")
         for app_name in os.listdir(Params.STORAGE_DIR):
             if not os.path.isdir(os.path.join(Params.STORAGE_DIR, app_name)):
+                continue
+            if self.__only_app is not None and app_name!=self.__only_app:
                 continue
             PrintService.h2(f"App {app_name}")
             self.__process_app(app_name)

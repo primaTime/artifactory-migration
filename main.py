@@ -68,6 +68,14 @@ if __name__ == '__main__':
         default=None,
         help="Destination repository URL"
     )
+    ap.add_argument(
+        "-o",
+        "--only_app",
+        type=str,
+        required=False,
+        default=None,
+        help="Specify if you want to apply the script to only one application/repository (specify its name, e.g. api-client)."
+    )
 
     args = vars(ap.parse_args())
 
@@ -79,8 +87,8 @@ if __name__ == '__main__':
     )
 
     if not args["skip_downloading"]:
-        download_service = DownloadService(request_service, args["year"])
+        download_service = DownloadService(request_service, args["year"], args["only_app"])
         download_service.run()
-    upload_service = UploadService(args["destination_url"], args["token"])
+    upload_service = UploadService(args["destination_url"], args["token"], args["only_app"])
     upload_service.run()
 

@@ -1,6 +1,8 @@
 
 class CommandBuilder:
-    __command_list: list[str] = []
+
+    def __init__(self):
+        self.__command_list: list[str] = []
 
     def add_argument(self, argument: str):
         self.__command_list.append(argument)

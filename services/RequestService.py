@@ -6,10 +6,6 @@ from schema.RequestMethod import RequestMethod
 
 
 class RequestService:
-    __user: str = ""
-    __password: str = ""
-    __base_url: str = ""
-    __repo_uri: str = ""
 
     def __init__(self, user: str, password: str, base_url: str, repo_uri: str):
         self.__user = user
