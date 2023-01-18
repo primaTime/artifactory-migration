@@ -2,6 +2,8 @@ from services.DownloadService import DownloadService
 from services.RequestService import RequestService
 import argparse
 
+from services.UploadService import UploadService
+
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument(
@@ -36,6 +38,36 @@ if __name__ == '__main__':
         default=None,
         help="Relative path to main repo directory (for example /repo/eu/abra/primaerp/)",
     )
+    ap.add_argument(
+        "-y",
+        "--year",
+        type=int,
+        required=False,
+        default=None,
+        help="If specified, only versions created in this year or later will be taken."
+    )
+    ap.add_argument(
+        "-s",
+        "--skip_downloading",
+        action="store_true",
+        help="Skip the download phase"
+    )
+    ap.add_argument(
+        "-t",
+        "--token",
+        type=str,
+        required=True,
+        default=None,
+        help="GitHub personal access token (classic) with packages write permission"
+    )
+    ap.add_argument(
+        "-d",
+        "--destination_url",
+        type=str,
+        required=True,
+        default=None,
+        help="Destination repository URL"
+    )
 
     args = vars(ap.parse_args())
 
@@ -46,6 +78,9 @@ if __name__ == '__main__':
         repo_uri=args["repo_uri"]
     )
 
-    download_service = DownloadService(request_service)
-    download_service.run()
+    if not args["skip_downloading"]:
+        download_service = DownloadService(request_service, args["year"])
+        download_service.run()
+    upload_service = UploadService(args["destination_url"], args["token"])
+    upload_service.run()
 
