@@ -8,3 +8,4 @@ class ArtifactData(TypedDict):
     jar: str
     jar_with_dependencies: str
     war: str
+    zip: str

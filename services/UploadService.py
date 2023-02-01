@@ -50,6 +50,8 @@ class UploadService:
                     data["jar"] = file_path
             elif "war" in file_extension:
                 data["war"] = file_path
+            elif "zip" in file_extension:
+                data["zip"] = file_path
 
         try:
             if "pom" not in data:
@@ -58,11 +60,13 @@ class UploadService:
             builder = self.__generate_upload_command(data["pom"])
 
             file_arg: str = "file"
-            if "jar" in data or "war" in data:
+            if "jar" in data or "war" in data or "zip" in data:
                 if "jar" in data:
                     builder.add_mvn_argument(file_arg, data["jar"])
                 elif "war" in data:
                     builder.add_mvn_argument(file_arg, data["war"])
+                elif "zip" in data:
+                    builder.add_mvn_argument(file_arg, data["zip"])
             else:
                 builder.add_mvn_argument(file_arg, data["pom"])
 
